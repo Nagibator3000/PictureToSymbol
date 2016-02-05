@@ -2,19 +2,38 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.URL;
+import java.util.Scanner;
 
 public class Start {
     static double[][] brightness;
+    static BufferedImage img;
 
     public static void main(String[] args) throws IOException {
-        BufferedImage img = ImageIO.read(new File("img1.png"));
-        BufferedImage scaled = new BufferedImage(50, 50,
-                BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = scaled.createGraphics();
-        g.drawImage(img, 0, 0, 50, 50, null);
-        g.dispose();
+        System.out.println("Choose file source");
+        System.out.println("Read frome file: 1");
+        System.out.println("Read frome URL: 2");
+        Scanner scn = new Scanner(System.in);
+        int choise = scn.nextInt();
+        switch (choise) {
+            case 1:
+                System.out.println("Enter file name");
+                Scanner scanner = new Scanner(System.in);
+                String nameImg = scanner.next();
+                img = ImageIO.read(new File(nameImg + ".png"));
+                break;
+            case 2:
+                System.out.println("Enter Url");
+                Scanner scanner1 = new Scanner(System.in);
+                String urlTitle = scanner1.next();
+                URL urlImage = new URL(urlTitle);
+                img = ImageIO.read(urlImage);
+                break;
+        }
 
-        ImageIO.write(scaled, "PNG", new File("img.png"));
+
+        BufferedImage scaled = resizeImg(img);
+
 
         img.getHeight();
         img.getWidth();
@@ -28,8 +47,13 @@ public class Start {
 
     }
 
-    public static void resizeImg(BufferedImage img) throws IOException {
-
+    public static BufferedImage resizeImg(BufferedImage img) {
+        BufferedImage scaled = new BufferedImage(100, 100,
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = scaled.createGraphics();
+        g.drawImage(img, 0, 0, 100, 100, null);
+        g.dispose();
+        return scaled;
     }
 
     public static void printSymbolImg(BufferedImage img) throws FileNotFoundException, UnsupportedEncodingException {
