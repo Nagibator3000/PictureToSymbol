@@ -8,8 +8,25 @@ import java.util.Scanner;
 public class Start {
     static double[][] brightness;
     static BufferedImage img;
+    static String config;
 
     public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader("config.txt"));
+        try {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+               // String[] split = line.split("=");
+            }
+            config = sb.toString();
+        } finally {
+            br.close();
+        }
+        System.out.println(config);
         System.out.println("Choose file source");
         System.out.println("Read frome file: 1");
         System.out.println("Read frome URL: 2");
@@ -24,9 +41,10 @@ public class Start {
                 break;
             case 2:
                 System.out.println("Enter Url");
-                Scanner scanner1 = new Scanner(System.in);
-                String urlTitle = scanner1.next();
-                URL urlImage = new URL(urlTitle);
+                BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+                String urlTitel = in.readLine();
+                urlTitel = urlTitel.substring(0, urlTitel.length() - 1);
+                URL urlImage = new URL(urlTitel);
                 img = ImageIO.read(urlImage);
                 break;
         }
@@ -60,15 +78,14 @@ public class Start {
         PrintWriter writer = new PrintWriter("imgTxt.txt", "UTF-8");
         for (int i = 0; i < img.getHeight(); i++) {
             for (int j = 0; j < img.getWidth(); j++) {
-                if (brightness[i][j] < 86) {
+                double v = brightness[i][j];
+                if (v < 86) {
                     System.out.print("#");
                     writer.print("#");
-                }
-                if (85 < brightness[i][j] && brightness[i][j] < 171) {
+                } else if (v < 171) {
                     System.out.print("*");
                     writer.print("*");
-                }
-                if (170 < brightness[i][j]) {
+                } else {
                     System.out.print("'");
                     writer.print("'");
                 }
