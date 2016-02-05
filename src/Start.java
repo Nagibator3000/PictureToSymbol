@@ -8,14 +8,27 @@ public class Start {
 
     public static void main(String[] args) throws IOException {
         BufferedImage img = ImageIO.read(new File("img1.png"));
+        BufferedImage scaled = new BufferedImage(50, 50,
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = scaled.createGraphics();
+        g.drawImage(img, 0, 0, 50, 50, null);
+        g.dispose();
+
+        ImageIO.write(scaled, "PNG", new File("img.png"));
+
         img.getHeight();
         img.getWidth();
         brightness = new double[img.getHeight()][img.getWidth()];
 
-        calculateBrightness(img);
 
-        printSymbolImg(img);
+        calculateBrightness(scaled);
 
+        printSymbolImg(scaled);
+
+
+    }
+
+    public static void resizeImg(BufferedImage img) throws IOException {
 
     }
 
@@ -31,7 +44,7 @@ public class Start {
                     System.out.print("*");
                     writer.print("*");
                 }
-                if (170 < brightness[i][j]){
+                if (170 < brightness[i][j]) {
                     System.out.print("'");
                     writer.print("'");
                 }
@@ -51,9 +64,7 @@ public class Start {
                 int green = color.getGreen();
                 double y = 0.3 * red + 0.59 * green + 0.11 * blue;
                 brightness[i][j] = y;
-                System.out.print(brightness[i][j] + " ");
             }
-            System.out.println();
         }
     }
 }
