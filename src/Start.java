@@ -1,3 +1,8 @@
+import com.google.gson.Gson;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -14,10 +19,18 @@ public class Start {
     public static String defaultIntFile;
     public static int defaultOutImageSize;
     public static String choice;
-    private static String outputPath="";
+    private static String outputPath = "";
 
     public static void main(String[] args) throws IOException {
 
+        String userIds = "73860786,1";
+        String jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + userIds + "&fields=photo_max_orig");
+
+        Container container = new Gson().fromJson(jsonString, Container.class);
+        for (User user : container.response) {
+            System.out.println(user.photo_max_orig);
+
+        }
         BufferedReader br = new BufferedReader(new FileReader("config.txt"));
         try {
 
@@ -51,6 +64,7 @@ public class Start {
         System.out.println("Choose file source");
         System.out.println("Read frome file: 1");
         System.out.println("Read frome URL: 2");
+        System.out.println("Read frome Vk User: 3");
 
         choice = readString();
 
@@ -63,7 +77,7 @@ public class Start {
 
 
                 String nameImg = readString();
-                if (nameImg.equals("")){
+                if (nameImg.equals("")) {
                     nameImg = defaultLocFile;
                 }
                 img = ImageIO.read(new File(nameImg));
@@ -73,20 +87,21 @@ public class Start {
                 System.out.println("Enter Url");
 
                 String urlTitel = readString();
-                if (urlTitel.equals("")){
-                    urlTitel=defaultIntFile;
-                }else{
-                urlTitel = urlTitel.substring(0, urlTitel.length() - 1);}
+                if (urlTitel.equals("")) {
+                    urlTitel = defaultIntFile;
+                } else {
+                    urlTitel = urlTitel.substring(0, urlTitel.length() - 1);
+                }
                 URL urlImage = new URL(urlTitel);
                 img = ImageIO.read(urlImage);
                 break;
+            case "3":
         }
         System.out.println("Enter size");
         String s = readString();
-        if (s.equals("")){
-            size=defaultOutImageSize;
-        }
-        else {
+        if (s.equals("")) {
+            size = defaultOutImageSize;
+        } else {
             size = Integer.parseInt(s);
         }
 
@@ -105,6 +120,17 @@ public class Start {
 
     }
 
+    public static String getUrl(String url) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Response response = client.newCall(request).execute();
+        return response.body().string();
+    }
+
     private static String readString() throws IOException {
         BufferedReader bufr = new BufferedReader(new InputStreamReader(System.in));
         return bufr.readLine();
@@ -120,7 +146,7 @@ public class Start {
     }
 
     public static void printSymbolImg(BufferedImage img) throws FileNotFoundException, UnsupportedEncodingException {
-        PrintWriter writer = new PrintWriter(outputPath+"imgTxt.txt", "UTF-8");
+        PrintWriter writer = new PrintWriter(outputPath + "imgTxt.txt", "UTF-8");
         for (int i = 0; i < img.getHeight(); i++) {
             for (int j = 0; j < img.getWidth(); j++) {
                 double v = brightness[i][j];
