@@ -14,8 +14,10 @@ public class Start {
     public static String defaultIntFile;
     public static int defaultOutImageSize;
     public static String choice;
+    private static String outputPath="";
 
     public static void main(String[] args) throws IOException {
+
         BufferedReader br = new BufferedReader(new FileReader("config.txt"));
         try {
 
@@ -23,14 +25,19 @@ public class Start {
 
             while (line != null) {
                 String[] split = line.split("=");
-                if (split[0].equals("default_mode")) {
-                    defaultMode = split[1];
-                } else if (split[0].equals("default_local_file")) {
-                    defaultLocFile = split[1];
-                } else if (split[0].equals("default_internet_file")) {
-                    defaultIntFile = split[1];
-                } else if (split[0].equals("default_output_image_size")) {
-                    defaultOutImageSize = Integer.parseInt(split[1]);
+                switch (split[0]) {
+                    case "default_mode":
+                        defaultMode = split[1];
+                        break;
+                    case "default_local_file":
+                        defaultLocFile = split[1];
+                        break;
+                    case "default_internet_file":
+                        defaultIntFile = split[1];
+                        break;
+                    case "default_output_image_size":
+                        defaultOutImageSize = Integer.parseInt(split[1]);
+                        break;
                 }
 
                 line = br.readLine();
@@ -113,7 +120,7 @@ public class Start {
     }
 
     public static void printSymbolImg(BufferedImage img) throws FileNotFoundException, UnsupportedEncodingException {
-        PrintWriter writer = new PrintWriter("imgTxt.txt", "UTF-8");
+        PrintWriter writer = new PrintWriter(outputPath+"imgTxt.txt", "UTF-8");
         for (int i = 0; i < img.getHeight(); i++) {
             for (int j = 0; j < img.getWidth(); j++) {
                 double v = brightness[i][j];
@@ -147,3 +154,22 @@ public class Start {
         }
     }
 }
+/*  BufferedImage map = ImageIO.read(new File("map.png"));
+
+        BufferedImage outputImage =
+                new BufferedImage(WIDTH, HEIGHT,
+                        BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2 = outputImage.createGraphics();
+из g2 можно вызывать методы установки цвета, рисование символо, строк
+        g2.drawImage(map, 0, 0, WIDTH, HEIGHT, (img, f, x1, y1, width, height) -> true);
+
+
+
+        g2.setStroke(new BasicStroke(3));
+
+
+        File outputFile = new File("output.png");
+        ImageIO.write(outputImage, "png", outputFile);
+        System.out.println("saved output outputImage " + outputFile);
+    }*/
