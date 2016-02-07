@@ -3,52 +3,85 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
-import java.util.Scanner;
+
 
 public class Start {
     static double[][] brightness;
     static BufferedImage img;
-    static String config;
+    static int size;
+    public static String defaultMode;
+    public static String defaultLocFile;
+    public static String defaultIntFile;
+    public static int defaultOutImageSize;
+    public static String choice;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader("config.txt"));
         try {
-            StringBuilder sb = new StringBuilder();
+
             String line = br.readLine();
 
             while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
+                String[] split = line.split("=");
+                if (split[0].equals("default_mode")) {
+                    defaultMode = split[1];
+                } else if (split[0].equals("default_local_file")) {
+                    defaultLocFile = split[1];
+                } else if (split[0].equals("default_internet_file")) {
+                    defaultIntFile = split[1];
+                } else if (split[0].equals("default_output_image_size")) {
+                    defaultOutImageSize = Integer.parseInt(split[1]);
+                }
+
                 line = br.readLine();
-               // String[] split = line.split("=");
+
             }
-            config = sb.toString();
+
         } finally {
             br.close();
         }
-        System.out.println(config);
+
         System.out.println("Choose file source");
         System.out.println("Read frome file: 1");
         System.out.println("Read frome URL: 2");
-        Scanner scn = new Scanner(System.in);
-        int choise = scn.nextInt();
-        switch (choise) {
-            case 1:
+
+        choice = readString();
+
+        if (choice.equals("")) {
+            choice = defaultMode;
+        }
+        switch (choice) {
+            case "1":
                 System.out.println("Enter file name");
-                Scanner scanner = new Scanner(System.in);
-                String nameImg = scanner.next();
-                img = ImageIO.read(new File(nameImg + ".png"));
+
+
+                String nameImg = readString();
+                if (nameImg.equals("")){
+                    nameImg = defaultLocFile;
+                }
+                img = ImageIO.read(new File(nameImg));
                 break;
-            case 2:
+            case "2":
+
                 System.out.println("Enter Url");
-                BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-                String urlTitel = in.readLine();
-                urlTitel = urlTitel.substring(0, urlTitel.length() - 1);
+
+                String urlTitel = readString();
+                if (urlTitel.equals("")){
+                    urlTitel=defaultIntFile;
+                }else{
+                urlTitel = urlTitel.substring(0, urlTitel.length() - 1);}
                 URL urlImage = new URL(urlTitel);
                 img = ImageIO.read(urlImage);
                 break;
         }
-
+        System.out.println("Enter size");
+        String s = readString();
+        if (s.equals("")){
+            size=defaultOutImageSize;
+        }
+        else {
+            size = Integer.parseInt(s);
+        }
 
         BufferedImage scaled = resizeImg(img);
 
@@ -65,11 +98,16 @@ public class Start {
 
     }
 
+    private static String readString() throws IOException {
+        BufferedReader bufr = new BufferedReader(new InputStreamReader(System.in));
+        return bufr.readLine();
+    }
+
     public static BufferedImage resizeImg(BufferedImage img) {
-        BufferedImage scaled = new BufferedImage(100, 100,
+        BufferedImage scaled = new BufferedImage(size, size,
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = scaled.createGraphics();
-        g.drawImage(img, 0, 0, 100, 100, null);
+        g.drawImage(img, 0, 0, size, size, null);
         g.dispose();
         return scaled;
     }
