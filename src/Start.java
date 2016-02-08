@@ -11,8 +11,6 @@ import java.net.URL;
 
 
 public class Start {
-    static double[][] brightness;
-    static BufferedImage img;
     static int size;
     public static String defaultMode;
     public static String defaultLocFile;
@@ -20,17 +18,27 @@ public class Start {
     public static int defaultOutImageSize;
     public static String choice;
     private static String outputPath = "";
+    private static PrintWriter writer;
 
     public static void main(String[] args) throws IOException {
 
-        String userIds = "73860786,1";
-        String jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + userIds + "&fields=photo_max_orig");
+       /* String userIds = "73860786";
 
-        Container container = new Gson().fromJson(jsonString, Container.class);
-        for (User user : container.response) {
-            System.out.println(user.photo_max_orig);
+        String jsonString1 = getUrl("https://api.vk.com/method/friends.get?user_id=" + userIds);
+
+
 
         }
+        FriendsGetResponse friendsGetResponse = new Gson().fromJson(jsonString1, FriendsGetResponse.class);
+        for (Long aLong : friendsGetResponse.response) {
+            jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + aLong + "&fields=photo_max_orig");
+             usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
+            for (User user : usersGetResponse.response) {
+                System.out.println(user.photo_max_orig);
+
+            }
+        }*/
+
         BufferedReader br = new BufferedReader(new FileReader("config.txt"));
         try {
 
@@ -60,17 +68,26 @@ public class Start {
         } finally {
             br.close();
         }
-
+        System.out.println("Enter size");
+        String s = readString();
+        if (s.equals("")) {
+            size = defaultOutImageSize;
+        } else {
+            size = Integer.parseInt(s);
+        }
         System.out.println("Choose file source");
         System.out.println("Read frome file: 1");
         System.out.println("Read frome URL: 2");
         System.out.println("Read frome Vk User: 3");
+
+
 
         choice = readString();
 
         if (choice.equals("")) {
             choice = defaultMode;
         }
+        writer = new PrintWriter(outputPath + "imgTxt.txt", "UTF-8");
         switch (choice) {
             case "1":
                 System.out.println("Enter file name");
@@ -80,7 +97,8 @@ public class Start {
                 if (nameImg.equals("")) {
                     nameImg = defaultLocFile;
                 }
-                img = ImageIO.read(new File(nameImg));
+                BufferedImage img = ImageIO.read(new File(nameImg));
+                handleImg(img);
                 break;
             case "2":
 
@@ -94,30 +112,48 @@ public class Start {
                 }
                 URL urlImage = new URL(urlTitel);
                 img = ImageIO.read(urlImage);
+                handleImg(img);
                 break;
             case "3":
-        }
-        System.out.println("Enter size");
-        String s = readString();
-        if (s.equals("")) {
-            size = defaultOutImageSize;
-        } else {
-            size = Integer.parseInt(s);
-        }
+                System.out.println("Enter user VK id");
+                String userIds = readString();
+                String jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + userIds + "&fields=photo_max_orig");
+                UsersGetResponse usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
+                for (User user : usersGetResponse.response) {
+                    System.out.println(user.photo_max_orig);
 
+                    URL urlImage1 = new URL(user.photo_max_orig);
+                    img = ImageIO.read(urlImage1);
+                    handleImg(img);
+                }
+
+                String jsonString1 = getUrl("https://api.vk.com/method/friends.get?user_id=" + userIds);
+                FriendsGetResponse friendsGetResponse = new Gson().fromJson(jsonString1, FriendsGetResponse.class);
+                for (Long aLong : friendsGetResponse.response) {
+                    jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + aLong + "&fields=photo_max_orig");
+                    usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
+                    for (User user : usersGetResponse.response) {
+                        System.out.println(user.photo_max_orig);
+                        System.out.println(user.first_name);
+
+                        URL urlImage1 = new URL(user.photo_max_orig);
+                        img = ImageIO.read(urlImage1);
+                        handleImg(img);
+                        writer.println(user.first_name);
+                    }
+                }
+                break;
+        }
+        writer.close();
+
+
+    }
+
+    public static void handleImg(BufferedImage img) throws FileNotFoundException, UnsupportedEncodingException {
         BufferedImage scaled = resizeImg(img);
-
-
-        img.getHeight();
-        img.getWidth();
-        brightness = new double[img.getHeight()][img.getWidth()];
-
-
-        calculateBrightness(scaled);
-
-        printSymbolImg(scaled);
-
-
+        double[][] brightness = new double[scaled.getHeight()][scaled.getWidth()];
+        calculateBrightness(scaled, brightness);
+        printSymbolImg(scaled, brightness);
     }
 
     public static String getUrl(String url) throws IOException {
@@ -137,16 +173,18 @@ public class Start {
     }
 
     public static BufferedImage resizeImg(BufferedImage img) {
-        BufferedImage scaled = new BufferedImage(size, size,
+        float ratio = img.getHeight() / (img.getWidth() * 1f);
+        int height = (int) (size * ratio);
+        BufferedImage scaled = new BufferedImage(size, height,
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = scaled.createGraphics();
-        g.drawImage(img, 0, 0, size, size, null);
+        g.drawImage(img, 0, 0, size, (int) (size * ratio), null);
         g.dispose();
         return scaled;
     }
 
-    public static void printSymbolImg(BufferedImage img) throws FileNotFoundException, UnsupportedEncodingException {
-        PrintWriter writer = new PrintWriter(outputPath + "imgTxt.txt", "UTF-8");
+    public static void printSymbolImg(BufferedImage img, double[][] brightness) throws FileNotFoundException, UnsupportedEncodingException {
+
         for (int i = 0; i < img.getHeight(); i++) {
             for (int j = 0; j < img.getWidth(); j++) {
                 double v = brightness[i][j];
@@ -164,10 +202,10 @@ public class Start {
             System.out.println();
             writer.println();
         }
-        writer.close();
+
     }
 
-    public static void calculateBrightness(BufferedImage img) {
+    public static void calculateBrightness(BufferedImage img, double[][] brightness) {
         for (int i = 0; i < img.getHeight(); i++) {
             for (int j = 0; j < img.getWidth(); j++) {
                 Color color = new Color(img.getRGB(j, i));
