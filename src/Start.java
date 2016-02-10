@@ -19,25 +19,11 @@ public class Start {
     public static String choice;
     private static String outputPath = "";
     private static PrintWriter writer;
+    private static String namePic="output";
+    private static String nameFloder="";
 
     public static void main(String[] args) throws IOException {
 
-       /* String userIds = "73860786";
-
-        String jsonString1 = getUrl("https://api.vk.com/method/friends.get?user_id=" + userIds);
-
-
-
-        }
-        FriendsGetResponse friendsGetResponse = new Gson().fromJson(jsonString1, FriendsGetResponse.class);
-        for (Long aLong : friendsGetResponse.response) {
-            jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + aLong + "&fields=photo_max_orig");
-             usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
-            for (User user : usersGetResponse.response) {
-                System.out.println(user.photo_max_orig);
-
-            }
-        }*/
 
         BufferedReader br = new BufferedReader(new FileReader("config.txt"));
         try {
@@ -79,7 +65,6 @@ public class Start {
         System.out.println("Read frome file: 1");
         System.out.println("Read frome URL: 2");
         System.out.println("Read frome Vk User: 3");
-
 
 
         choice = readString();
@@ -124,6 +109,8 @@ public class Start {
 
                     URL urlImage1 = new URL(user.photo_max_orig);
                     img = ImageIO.read(urlImage1);
+                    nameFloder = user.first_name+user.last_name+"(photo)"+"/";
+                    namePic = user.first_name;
                     handleImg(img);
                 }
 
@@ -138,6 +125,8 @@ public class Start {
 
                         URL urlImage1 = new URL(user.photo_max_orig);
                         img = ImageIO.read(urlImage1);
+                        namePic = user.first_name;
+
                         handleImg(img);
                         writer.println(user.first_name);
                     }
@@ -149,17 +138,49 @@ public class Start {
 
     }
 
-    public static void handleImg(BufferedImage img) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void handleImg(BufferedImage img) throws IOException {
         BufferedImage scaled = resizeImg(img);
+        String[][] symbols = new String[scaled.getHeight()][scaled.getWidth()];
         double[][] brightness = new double[scaled.getHeight()][scaled.getWidth()];
         calculateBrightness(scaled, brightness);
-        printSymbolImg(scaled, brightness);
+        printSymbolImg(scaled, brightness, symbols);
+        int fontSize = 12;
+
+        printColorInFile(scaled, symbols, fontSize);
+
+
     }
+
+    public static void printColorInFile(BufferedImage scaled, String[][] symbols, int fontSize) throws IOException {
+        BufferedImage outputImg =
+                new BufferedImage(scaled.getWidth() * 7, scaled.getHeight() * 10,
+                        BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = outputImg.createGraphics();
+        int h = 0;
+        int h2 = 1;
+        for (int i = 0; i < scaled.getHeight(); i++) {
+            for (int j = 0; j < scaled.getWidth(); j++) {
+                Color color = new Color(scaled.getRGB(j, i));
+
+                g2.setColor(color);
+                g2.drawString(symbols[i][j], h, h2 + 8);
+                h = h + 7;
+            }
+            h = 0;
+            h2 = h2 + 10;
+
+        }
+
+        File myPath = new File(nameFloder);
+        myPath.mkdir();
+        File outputFile = new File(nameFloder + namePic + ".png");
+        ImageIO.write(outputImg, "png", outputFile);
+        System.out.println("saved output outputImage " + outputFile);
+    }
+
 
     public static String getUrl(String url) throws IOException {
         OkHttpClient client = new OkHttpClient();
-
-
         Request request = new Request.Builder()
                 .url(url)
                 .build();
@@ -183,19 +204,22 @@ public class Start {
         return scaled;
     }
 
-    public static void printSymbolImg(BufferedImage img, double[][] brightness) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void printSymbolImg(BufferedImage img, double[][] brightness, String[][] symbol) throws FileNotFoundException, UnsupportedEncodingException {
 
         for (int i = 0; i < img.getHeight(); i++) {
             for (int j = 0; j < img.getWidth(); j++) {
                 double v = brightness[i][j];
                 if (v < 86) {
+                    symbol[i][j] = "8";
                     System.out.print("#");
                     writer.print("#");
                 } else if (v < 171) {
-                    System.out.print("*");
+                    symbol[i][j] = "&";
+                    System.out.print("#");
                     writer.print("*");
                 } else {
-                    System.out.print("'");
+                    symbol[i][j] = "3";
+                    System.out.print("*");
                     writer.print("'");
                 }
             }
@@ -210,30 +234,15 @@ public class Start {
             for (int j = 0; j < img.getWidth(); j++) {
                 Color color = new Color(img.getRGB(j, i));
                 int red = color.getRed();
-                int blue = color.getBlue();
                 int green = color.getGreen();
+                int blue = color.getBlue();
+
                 double y = 0.3 * red + 0.59 * green + 0.11 * blue;
+
                 brightness[i][j] = y;
             }
         }
     }
+
+
 }
-/*  BufferedImage map = ImageIO.read(new File("map.png"));
-
-        BufferedImage outputImage =
-                new BufferedImage(WIDTH, HEIGHT,
-                        BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g2 = outputImage.createGraphics();
-из g2 можно вызывать методы установки цвета, рисование символо, строк
-        g2.drawImage(map, 0, 0, WIDTH, HEIGHT, (img, f, x1, y1, width, height) -> true);
-
-
-
-        g2.setStroke(new BasicStroke(3));
-
-
-        File outputFile = new File("output.png");
-        ImageIO.write(outputImage, "png", outputFile);
-        System.out.println("saved output outputImage " + outputFile);
-    }*/
