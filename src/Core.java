@@ -4,13 +4,14 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 
 
-public class Start {
+public class Core {
     static int size;
     public static String defaultMode;
     public static String defaultLocFile;
@@ -19,48 +20,21 @@ public class Start {
     public static String choice;
     private static String outputPath = "";
     private static PrintWriter writer;
-    private static String namePic="output";
-    private static String nameFloder="";
-
-    public static void main(String[] args) throws IOException {
+    private static String namePic = "output";
+    private static String nameFloder = "";
 
 
-        BufferedReader br = new BufferedReader(new FileReader("config.txt"));
-        try {
 
-            String line = br.readLine();
 
-            while (line != null) {
-                String[] split = line.split("=");
-                switch (split[0]) {
-                    case "default_mode":
-                        defaultMode = split[1];
-                        break;
-                    case "default_local_file":
-                        defaultLocFile = split[1];
-                        break;
-                    case "default_internet_file":
-                        defaultIntFile = split[1];
-                        break;
-                    case "default_output_image_size":
-                        defaultOutImageSize = Integer.parseInt(split[1]);
-                        break;
-                }
 
-                line = br.readLine();
 
-            }
 
-        } finally {
-            br.close();
-        }
+    public static void runConsole() throws IOException {
+        setDefaultOptions();
+
         System.out.println("Enter size");
         String s = readString();
-        if (s.equals("")) {
-            size = defaultOutImageSize;
-        } else {
-            size = Integer.parseInt(s);
-        }
+        setSize(s);
         System.out.println("Choose file source");
         System.out.println("Read frome file: 1");
         System.out.println("Read frome URL: 2");
@@ -90,14 +64,7 @@ public class Start {
                 System.out.println("Enter Url");
 
                 String urlTitel = readString();
-                if (urlTitel.equals("")) {
-                    urlTitel = defaultIntFile;
-                } else {
-                    urlTitel = urlTitel.substring(0, urlTitel.length() - 1);
-                }
-                URL urlImage = new URL(urlTitel);
-                img = ImageIO.read(urlImage);
-                handleImg(img);
+                urlAction(urlTitel);
                 break;
             case "3":
                 System.out.println("Enter user VK id");
@@ -109,7 +76,7 @@ public class Start {
 
                     URL urlImage1 = new URL(user.photo_max_orig);
                     img = ImageIO.read(urlImage1);
-                    nameFloder = user.first_name+user.last_name+"(photo)"+"/";
+                    nameFloder = user.first_name + user.last_name + "(photo)" + "/";
                     namePic = user.first_name;
                     handleImg(img);
                 }
@@ -125,7 +92,7 @@ public class Start {
 
                         URL urlImage1 = new URL(user.photo_max_orig);
                         img = ImageIO.read(urlImage1);
-                        namePic = user.first_name;
+                        namePic = user.first_name + "_" + user.last_name;
 
                         handleImg(img);
                         writer.println(user.first_name);
@@ -134,8 +101,58 @@ public class Start {
                 break;
         }
         writer.close();
+    }
 
+    public static void urlAction(String urlTitel) throws IOException {
+        BufferedImage img;
+        if (urlTitel.equals("")) {
+            urlTitel = defaultIntFile;
+        } else {
+            urlTitel = urlTitel.substring(0, urlTitel.length() - 1);
+        }
+        URL urlImage = new URL(urlTitel);
+        img = ImageIO.read(urlImage);
+        handleImg(img);
+    }
 
+    public static void setDefaultOptions() throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader("config.txt"));
+        try {
+
+            String line = br.readLine();
+
+            while (line != null) {
+                String[] split = line.split("=");
+                switch (split[0]) {
+                    case "default_mode":
+                        defaultMode = split[1];
+                        break;
+                    case "default_local_file":
+                        defaultLocFile = split[1];
+                        break;
+                    case "default_internet_file":
+                        defaultIntFile = split[1];
+                        break;
+                    case "default_output_image_size":
+                        defaultOutImageSize = Integer.parseInt(split[1]);
+                        break;
+                }
+
+                line = br.readLine();
+
+            }
+
+        } finally {
+            br.close();
+        }
+    }
+
+    public static void setSize(String s) {
+        if (s.equals("")) {
+            size = defaultOutImageSize;
+        } else {
+            size = Integer.parseInt(s);
+        }
     }
 
     public static void handleImg(BufferedImage img) throws IOException {
@@ -171,9 +188,9 @@ public class Start {
 
         }
 
-        File myPath = new File(nameFloder);
+        File myPath = new File("output/" + nameFloder);
         myPath.mkdir();
-        File outputFile = new File(nameFloder + namePic + ".png");
+        File outputFile = new File("output/" + nameFloder + namePic + ".png");
         ImageIO.write(outputImg, "png", outputFile);
         System.out.println("saved output outputImage " + outputFile);
     }
@@ -210,16 +227,16 @@ public class Start {
             for (int j = 0; j < img.getWidth(); j++) {
                 double v = brightness[i][j];
                 if (v < 86) {
-                    symbol[i][j] = "8";
-                    System.out.print("#");
+                    symbol[i][j] = "#";
+                    //   System.out.print("#");
                     writer.print("#");
                 } else if (v < 171) {
                     symbol[i][j] = "&";
-                    System.out.print("#");
+                    //    System.out.print("#");
                     writer.print("*");
                 } else {
                     symbol[i][j] = "3";
-                    System.out.print("*");
+                    //  System.out.print("*");
                     writer.print("'");
                 }
             }
