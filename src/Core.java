@@ -115,6 +115,7 @@ public class Core {
         handleImg(img);
     }
 
+
     public static void setDefaultOptions() throws IOException {
         BufferedReader br = new BufferedReader(new FileReader("config.txt"));
         try {
