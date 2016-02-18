@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -83,26 +82,12 @@ public class MyGui {
 
         progressBar.setStringPainted(true);
         progressBar.setMinimum(0);
-        progressBar.setMaximum(Core.aLongLenght);
+        progressBar.setMaximum(Core.friendsCount);
 
         JButton buttonGoVkAction = new JButton("Go!");
         buttonGoVkAction.addActionListener(e -> {
-            String size = enterSize.getText();
-            Core.setSize(size);
-            try {
-                Core.creatPrintWriter();
-            } catch (FileNotFoundException e1) {
-                e1.printStackTrace();
-            } catch (UnsupportedEncodingException e1) {
-                e1.printStackTrace();
-            }
-            String userId = jTextFieldVkId.getText();
-            try {
-                Core.VkIdAction(userId);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            Core.closePrintWriter();
+            new Thread(() -> onVkGoClick(enterSize, jTextFieldVkId)).start();
+
 
 
         });
@@ -124,6 +109,25 @@ public class MyGui {
         frameVkId.add(panel3, BorderLayout.SOUTH);
         frameVkId.setVisible(true);
 
+    }
+
+    private void onVkGoClick(JTextField enterSize, JTextField jTextFieldVkId) {
+        String size = enterSize.getText();
+        Core.setSize(size);
+        try {
+            Core.creatPrintWriter();
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        } catch (UnsupportedEncodingException e1) {
+            e1.printStackTrace();
+        }
+        String userId = jTextFieldVkId.getText();
+        try {
+            Core.VkIdAction(userId);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        Core.closePrintWriter();
     }
 
     private void goGuiInFile() {

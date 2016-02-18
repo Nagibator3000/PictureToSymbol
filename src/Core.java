@@ -4,7 +4,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -23,7 +22,7 @@ public class Core {
     private static PrintWriter writer;
     private static String namePic = "output";
     private static String nameFloder = "";
-    public static int aLongLenght;
+    public static int friendsCount;
 
 
     public static void runConsole() throws IOException {
@@ -92,12 +91,14 @@ public class Core {
 
         String jsonString1 = getUrl("https://api.vk.com/method/friends.get?user_id=" + userIds);
         FriendsGetResponse friendsGetResponse = new Gson().fromJson(jsonString1, FriendsGetResponse.class);
-        aLongLenght = friendsGetResponse.response.size();
+        friendsCount = friendsGetResponse.response.size();
+        java.awt.EventQueue.invokeLater(() ->  MyGui.progressBar.setMaximum(friendsCount));
 
         for (Long aLong : friendsGetResponse.response) {
             jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + aLong + "&fields=photo_max_orig");
             usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
-            MyGui.progressBar.setValue(friendsGetResponse.response.indexOf(aLong));
+            java.awt.EventQueue.invokeLater(() ->  MyGui.progressBar.setValue(friendsGetResponse.response.indexOf(aLong)));
+
             for (User user : usersGetResponse.response) {
                 System.out.println(user.photo_max_orig);
                 System.out.println(user.first_name);
