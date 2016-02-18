@@ -1,5 +1,9 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,6 +17,7 @@ public class MyGui {
     JFrame mainFrame;
     static JProgressBar progressBar = new JProgressBar();
     String fileName;
+    private JTextField vkIdTextField;
 
     public void goGui() throws IOException {
         Core.setDefaultOptions();
@@ -76,8 +81,9 @@ public class MyGui {
         enterSize.setText(String.valueOf(Core.defaultOutImageSize));
 
         JLabel label1 = new JLabel("Enter vk id");
-        JTextField jTextFieldVkId = new JTextField(10);
-        jTextFieldVkId.setText(Core.defaultId);
+        vkIdTextField = new JTextField(10);
+        vkIdTextField.setText(Core.defaultId);
+        vkIdTextField.getDocument().addDocumentListener(new VkIdTextFieldListener());
 
 
         progressBar.setStringPainted(true);
@@ -85,12 +91,7 @@ public class MyGui {
         progressBar.setMaximum(Core.friendsCount);
 
         JButton buttonGoVkAction = new JButton("Go!");
-        buttonGoVkAction.addActionListener(e -> {
-            new Thread(() -> onVkGoClick(enterSize, jTextFieldVkId)).start();
-
-
-
-        });
+        buttonGoVkAction.addActionListener(e -> new Thread(() -> onVkGoClick(enterSize, vkIdTextField)).start());
 
         panel1.setLayout(new FlowLayout());
         panel1.add(label);
@@ -98,9 +99,20 @@ public class MyGui {
 
         panel2.setLayout(new FlowLayout());
         panel2.add(label1);
-        panel2.add(jTextFieldVkId);
+        panel2.add(vkIdTextField);
+
+        BufferedImage myPicture = null;
+        try {
+            myPicture = ImageIO.read(new File("444.png"));
+            JLabel picLabel = new JLabel(new ImageIcon(myPicture));
+            panel3.add(picLabel);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         panel3.setLayout(new FlowLayout());
+        panel3.add(buttonGoVkAction);
         panel3.add(buttonGoVkAction);
         panel3.add(progressBar);
 
@@ -257,4 +269,29 @@ public class MyGui {
     }
 
 
+    private class VkIdTextFieldListener implements DocumentListener {
+
+
+
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            onChange();
+        }
+
+        private void onChange() {
+            System.out.println(vkIdTextField.getText());
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+             onChange();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            onChange();
+
+        }
+    }
 }
