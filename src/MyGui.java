@@ -7,8 +7,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 public class MyGui {
-    JFrame frameUrl;
-    JFrame frameInFile;
+    JTextField fieldSize;
+    static JFrame frameUrl;
+    static JFrame frameInFile;
     static JFrame frameVkId;
     JFrame mainFrame;
     static JProgressBar progressBar = new JProgressBar();
@@ -73,9 +74,13 @@ public class MyGui {
 
         JLabel label = new JLabel("Enter size");
         JTextField enterSize = new JTextField(10);
+        enterSize.setText(String.valueOf(Core.defaultOutImageSize));
 
         JLabel label1 = new JLabel("Enter vk id");
         JTextField jTextFieldVkId = new JTextField(10);
+        jTextFieldVkId.setText(Core.defaultId);
+
+
         progressBar.setStringPainted(true);
         progressBar.setMinimum(0);
         progressBar.setMaximum(Core.aLongLenght);
@@ -133,8 +138,9 @@ public class MyGui {
 
         JLabel label = new JLabel("Enter size");
         JTextField enterSize = new JTextField(10);
+        enterSize.setText(String.valueOf(Core.defaultOutImageSize));
 
-        JButton buttonRunExploer = new JButton("Open file");
+        JButton buttonRunExploer = new JButton("Open Another");
         buttonRunExploer.addActionListener(e -> {
             JFileChooser fileopen = new JFileChooser();
             int ret = fileopen.showDialog(null, "Открыть файл");
@@ -150,8 +156,8 @@ public class MyGui {
 
         JButton buttonRunActionFile = new JButton("Go!");
         buttonRunActionFile.addActionListener(e -> {
-             String size = enterSize.getText();
-             Core.setSize(size);
+            String size = enterSize.getText();
+            Core.setSize(size);
             try {
                 Core.creatPrintWriter();
             } catch (FileNotFoundException e1) {
@@ -201,12 +207,14 @@ public class MyGui {
         JLabel labelUrlSize = new JLabel("Enter size");
         JLabel labelUrl = new JLabel("Enter Url  ");
 
-        JTextField textFieldEnterUrl = new JTextField(10);
-        JTextField textFieldEnterSize = new JTextField(10);
+        JTextField textUrl = new JTextField(10);
+        textUrl.setText(Core.defaultIntFile);
+        JTextField enterSize = new JTextField(10);
+        enterSize.setText(String.valueOf(Core.defaultOutImageSize));
 
         JButton buttonGoUrl = new JButton("Go!");
         buttonGoUrl.addActionListener(e -> {
-            String size = textFieldEnterSize.getText();
+            String size = enterSize.getText();
             Core.setSize(size);
             try {
                 Core.creatPrintWriter();
@@ -215,7 +223,7 @@ public class MyGui {
             } catch (UnsupportedEncodingException e1) {
                 e1.printStackTrace();
             }
-            String url = textFieldEnterUrl.getText() + ",";
+            String url = textUrl.getText() + ",";
             try {
                 Core.urlAction(url);
             } catch (IOException e1) {
@@ -228,11 +236,11 @@ public class MyGui {
 
         panelUrl1.setLayout(new FlowLayout());
         panelUrl1.add(labelUrlSize);
-        panelUrl1.add(textFieldEnterSize);
+        panelUrl1.add(enterSize);
 
         panelUrl2.setLayout(new FlowLayout());
         panelUrl2.add(labelUrl);
-        panelUrl2.add(textFieldEnterUrl);
+        panelUrl2.add(textUrl);
 
         panelUrl3.setLayout(new FlowLayout());
         panelUrl3.add(buttonGoUrl);

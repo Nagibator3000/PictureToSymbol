@@ -13,6 +13,7 @@ import java.net.URL;
 
 public class Core {
     static int size;
+    public static String defaultId;
     public static String defaultMode;
     public static String defaultLocFile;
     public static String defaultIntFile;
@@ -55,8 +56,8 @@ public class Core {
 
                 System.out.println("Enter Url");
 
-                String urlTitel = readString();
-                urlAction(urlTitel);
+                String urlTitle = readString();
+                urlAction(urlTitle);
                 break;
             case "3":
                 System.out.println("Enter user VK id");
@@ -152,6 +153,9 @@ public class Core {
                         break;
                     case "default_output_image_size":
                         defaultOutImageSize = Integer.parseInt(split[1]);
+                        break;
+                    case "default_vk_user_id":
+                        defaultId = split[1];
                         break;
                 }
 
