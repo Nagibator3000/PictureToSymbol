@@ -22,12 +22,7 @@ public class Core {
     private static PrintWriter writer;
     private static String namePic = "output";
     private static String nameFloder = "";
-    static int aLongLenght;
-
-
-
-
-
+    public static int aLongLenght;
 
 
     public static void runConsole() throws IOException {
@@ -54,11 +49,7 @@ public class Core {
 
 
                 String nameImg = readString();
-                if (nameImg.equals("")) {
-                    nameImg = defaultLocFile;
-                }
-                BufferedImage img = ImageIO.read(new File(nameImg));
-                handleImg(img);
+                getImgInFile(nameImg);
                 break;
             case "2":
 
@@ -74,6 +65,14 @@ public class Core {
                 break;
         }
         closePrintWriter();
+    }
+
+    public static void getImgInFile(String nameImg) throws IOException {
+        if (nameImg.equals("")) {
+            nameImg = defaultLocFile;
+        }
+        BufferedImage img = ImageIO.read(new File(nameImg));
+        handleImg(img);
     }
 
     public static void VkIdAction(String userIds) throws IOException {
@@ -92,10 +91,12 @@ public class Core {
 
         String jsonString1 = getUrl("https://api.vk.com/method/friends.get?user_id=" + userIds);
         FriendsGetResponse friendsGetResponse = new Gson().fromJson(jsonString1, FriendsGetResponse.class);
+        aLongLenght = friendsGetResponse.response.size();
+
         for (Long aLong : friendsGetResponse.response) {
             jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + aLong + "&fields=photo_max_orig");
             usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
-            aLongLenght = friendsGetResponse.response.size();
+            MyGui.progressBar.setValue(friendsGetResponse.response.indexOf(aLong));
             for (User user : usersGetResponse.response) {
                 System.out.println(user.photo_max_orig);
                 System.out.println(user.first_name);

@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.peer.ButtonPeer;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,18 +9,19 @@ import java.io.UnsupportedEncodingException;
 public class MyGui {
     JFrame frameUrl;
     JFrame frameInFile;
-    JFrame frameVkId;
-    JFrame mainFraim;
-
+    static JFrame frameVkId;
+    JFrame mainFrame;
+    static JProgressBar progressBar = new JProgressBar();
+    String fileName;
 
     public void goGui() throws IOException {
         Core.setDefaultOptions();
 
-        mainFraim = new JFrame("MainFrame");
-        mainFraim.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFraim.setSize(500, 150);
-        mainFraim.setLocationRelativeTo(null);
-        mainFraim.setLayout(new BorderLayout());
+        mainFrame = new JFrame("MainFrame");
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setSize(500, 150);
+        mainFrame.setLocationRelativeTo(null);
+        mainFrame.setLayout(new BorderLayout());
 
 
         JPanel panel1 = new JPanel(new FlowLayout());
@@ -53,15 +54,15 @@ public class MyGui {
         panel2.add(b3);
 
 
-        mainFraim.add(panel1, BorderLayout.NORTH);
-        mainFraim.add(panel2, BorderLayout.CENTER);
+        mainFrame.add(panel1, BorderLayout.NORTH);
+        mainFrame.add(panel2, BorderLayout.CENTER);
 
 
-        mainFraim.setVisible(true);
+        mainFrame.setVisible(true);
     }
 
     private void goGuiVkId() {
-        frameVkId = new JFrame();
+        frameVkId = new JFrame("FrameVkId");
         frameVkId.setSize(400, 200);
         frameVkId.setLocationRelativeTo(null);
         frameVkId.setLayout(new BorderLayout());
@@ -75,7 +76,7 @@ public class MyGui {
 
         JLabel label1 = new JLabel("Enter vk id");
         JTextField jTextFieldVkId = new JTextField(10);
-         JProgressBar progressBar = new JProgressBar();
+        progressBar.setStringPainted(true);
         progressBar.setMinimum(0);
         progressBar.setMaximum(Core.aLongLenght);
 
@@ -97,7 +98,6 @@ public class MyGui {
                 e1.printStackTrace();
             }
             Core.closePrintWriter();
-
 
 
         });
@@ -136,12 +136,38 @@ public class MyGui {
 
         JButton buttonRunExploer = new JButton("Open file");
         buttonRunExploer.addActionListener(e -> {
+            JFileChooser fileopen = new JFileChooser();
+            int ret = fileopen.showDialog(null, "Открыть файл");
+            if (ret == JFileChooser.APPROVE_OPTION) {
+                File file = fileopen.getSelectedFile();
+                fileName = file.getName();
 
+
+            }
         });
 
         JLabel nameFile = new JLabel("");
 
         JButton buttonRunActionFile = new JButton("Go!");
+        buttonRunActionFile.addActionListener(e -> {
+             String size = enterSize.getText();
+             Core.setSize(size);
+            try {
+                Core.creatPrintWriter();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (UnsupportedEncodingException e1) {
+                e1.printStackTrace();
+            }
+            try {
+                Core.getImgInFile(fileName);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            Core.closePrintWriter();
+            frameInFile.setVisible(false);
+
+        });
 
         panel1.setLayout(new FlowLayout());
         panel1.add(label);
