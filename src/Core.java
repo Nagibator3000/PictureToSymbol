@@ -46,7 +46,7 @@ public class Core {
         if (choice.equals("")) {
             choice = defaultMode;
         }
-        writer = new PrintWriter(outputPath + "imgTxt.txt", "UTF-8");
+        creatPrintWriter();
         switch (choice) {
             case "1":
                 System.out.println("Enter file name");
@@ -100,7 +100,15 @@ public class Core {
                 }
                 break;
         }
+        closePrintWriter();
+    }
+
+    public static void closePrintWriter() {
         writer.close();
+    }
+
+    public static void creatPrintWriter() throws FileNotFoundException, UnsupportedEncodingException {
+        writer = new PrintWriter(outputPath + "imgTxt.txt", "UTF-8");
     }
 
     public static void urlAction(String urlTitel) throws IOException {

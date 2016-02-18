@@ -1,73 +1,115 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.peer.ButtonPeer;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class MyGui {
-    JFrame frame;
-    JTextField textField;
-      String s;
+    JFrame frameUrl;
+    JFrame mainFraim;
 
-    public void goGui() {
-        frame = new JFrame("Petuh");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 500);
-        frame.setLocationRelativeTo(null);
-        frame.setLayout(new BorderLayout());
+
+    public void goGui() throws IOException {
+        Core.setDefaultOptions();
+
+        mainFraim = new JFrame("MainFrame");
+        mainFraim.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFraim.setSize(500, 500);
+        mainFraim.setLocationRelativeTo(null);
+        mainFraim.setLayout(new BorderLayout());
+
+
         JPanel panel1 = new JPanel(new FlowLayout());
         JPanel panel2 = new JPanel(new FlowLayout());
+
         JButton b1 = new JButton("From file");
         JButton b2 = new JButton("From Url");
         JButton b3 = new JButton("From id VK");
+
         b1.addActionListener(e -> {
             System.out.println("from file clicked");
 
         });
 
         b2.addActionListener(e -> {
-            try {
-                Core.setDefaultOptions();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-          String sText =  textField.getText();
-            Core.setSize(sText);
-           /* s= JOptionPane.showInputDialog("Enter Url");*/
-           s ="https://2ch.hk/pr/thumb/642217/14545279179070s.jpg,";
-            try {
-                Core.urlAction(s);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-
-
-            System.out.println("from url clicked");
-
-
+            goGuiUrl();
 
         });
         b3.addActionListener(e -> {
             System.out.println("from id Vk clicked");
-            s =JOptionPane.showInputDialog("Enter id Vk");
         });
 
-        textField = new JTextField(10);
 
-        JLabel label = new JLabel("Enter size");
-
-        panel2.add(textField);
+        JLabel enterText = new JLabel("Choose file source");
+        panel1.add(enterText);
         panel2.add(b1);
         panel2.add(b2);
         panel2.add(b3);
-        panel1.add(label);
-
-        frame.add(panel1, BorderLayout.NORTH);
-        frame.add(panel2, BorderLayout.CENTER);
 
 
-        frame.setVisible(true);
+        mainFraim.add(panel1, BorderLayout.NORTH);
+        mainFraim.add(panel2, BorderLayout.CENTER);
+
+
+        mainFraim.setVisible(true);
     }
 
+    public void goGuiUrl() {
+        frameUrl = new JFrame("FrameUrl");
+        frameUrl.setSize(400, 200);
+        frameUrl.setLocationRelativeTo(null);
+        frameUrl.setLayout(new BorderLayout());
 
+        JPanel panelUrl1 = new JPanel();
+        JPanel panelUrl2 = new JPanel();
+        JPanel panelUrl3 = new JPanel();
+
+        JLabel labelUrlSize = new JLabel("Enter size");
+        JLabel labelUrl = new JLabel("Enter Url  ");
+
+        JTextField textFieldEnterUrl = new JTextField(10);
+        JTextField textFieldEnterSize = new JTextField(10);
+
+        JButton buttonGoUrl = new JButton("Go!");
+        buttonGoUrl.addActionListener(e -> {
+            String size = textFieldEnterSize.getText();
+            Core.setSize(size);
+            try {
+                Core.creatPrintWriter();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (UnsupportedEncodingException e1) {
+                e1.printStackTrace();
+            }
+            String url = textFieldEnterUrl.getText()+",";
+            try {
+                Core.urlAction(url);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            Core.closePrintWriter();
+            frameUrl.setVisible(false);
+
+        });
+
+        panelUrl1.setLayout(new FlowLayout());
+        panelUrl1.add(labelUrlSize);
+        panelUrl1.add(textFieldEnterSize);
+
+        panelUrl2.setLayout(new FlowLayout());
+        panelUrl2.add(labelUrl);
+        panelUrl2.add(textFieldEnterUrl);
+
+        panelUrl3.setLayout(new FlowLayout());
+        panelUrl3.add(buttonGoUrl);
+
+        frameUrl.add(panelUrl1,BorderLayout.NORTH);
+        frameUrl.add(panelUrl2,BorderLayout.CENTER);
+        frameUrl.add(panelUrl3,BorderLayout.SOUTH);
+
+        frameUrl.setVisible(true);
+    }
 
 
 }
