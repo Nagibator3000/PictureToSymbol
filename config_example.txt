@@ -1,0 +1,5 @@
+default_mode=1
+default_local_file=444.png
+default_internet_file=http://s1.womanjournal.ru/sites/default/files/imagecache/slideshow-625x400/article/17153/slideshow/68b20594-5af3-4ff9-9b09-6068504b8bd5.jpg
+default_output_image_size=45
+default_vk_user_id=1
