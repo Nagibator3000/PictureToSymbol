@@ -1,12 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.peer.ButtonPeer;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 public class MyGui {
     JFrame frameUrl;
+    JFrame frameInFile;
+    JFrame frameVkId;
     JFrame mainFraim;
 
 
@@ -15,7 +18,7 @@ public class MyGui {
 
         mainFraim = new JFrame("MainFrame");
         mainFraim.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFraim.setSize(500, 500);
+        mainFraim.setSize(500, 150);
         mainFraim.setLocationRelativeTo(null);
         mainFraim.setLayout(new BorderLayout());
 
@@ -28,6 +31,7 @@ public class MyGui {
         JButton b3 = new JButton("From id VK");
 
         b1.addActionListener(e -> {
+            goGuiInFile();
             System.out.println("from file clicked");
 
         });
@@ -37,6 +41,7 @@ public class MyGui {
 
         });
         b3.addActionListener(e -> {
+            goGuiVkId();
             System.out.println("from id Vk clicked");
         });
 
@@ -53,6 +58,108 @@ public class MyGui {
 
 
         mainFraim.setVisible(true);
+    }
+
+    private void goGuiVkId() {
+        frameVkId = new JFrame();
+        frameVkId.setSize(400, 200);
+        frameVkId.setLocationRelativeTo(null);
+        frameVkId.setLayout(new BorderLayout());
+
+        JPanel panel1 = new JPanel();
+        JPanel panel2 = new JPanel();
+        JPanel panel3 = new JPanel();
+
+        JLabel label = new JLabel("Enter size");
+        JTextField enterSize = new JTextField(10);
+
+        JLabel label1 = new JLabel("Enter vk id");
+        JTextField jTextFieldVkId = new JTextField(10);
+         JProgressBar progressBar = new JProgressBar();
+        progressBar.setMinimum(0);
+        progressBar.setMaximum(Core.aLongLenght);
+
+        JButton buttonGoVkAction = new JButton("Go!");
+        buttonGoVkAction.addActionListener(e -> {
+            String size = enterSize.getText();
+            Core.setSize(size);
+            try {
+                Core.creatPrintWriter();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (UnsupportedEncodingException e1) {
+                e1.printStackTrace();
+            }
+            String userId = jTextFieldVkId.getText();
+            try {
+                Core.VkIdAction(userId);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            Core.closePrintWriter();
+
+
+
+        });
+
+        panel1.setLayout(new FlowLayout());
+        panel1.add(label);
+        panel1.add(enterSize);
+
+        panel2.setLayout(new FlowLayout());
+        panel2.add(label1);
+        panel2.add(jTextFieldVkId);
+
+        panel3.setLayout(new FlowLayout());
+        panel3.add(buttonGoVkAction);
+        panel3.add(progressBar);
+
+        frameVkId.add(panel1, BorderLayout.NORTH);
+        frameVkId.add(panel2, BorderLayout.CENTER);
+        frameVkId.add(panel3, BorderLayout.SOUTH);
+        frameVkId.setVisible(true);
+
+    }
+
+    private void goGuiInFile() {
+        frameInFile = new JFrame();
+        frameInFile.setSize(400, 200);
+        frameInFile.setLocationRelativeTo(null);
+        frameInFile.setLayout(new BorderLayout());
+
+        JPanel panel1 = new JPanel();
+        JPanel panel2 = new JPanel();
+        JPanel panel3 = new JPanel();
+
+        JLabel label = new JLabel("Enter size");
+        JTextField enterSize = new JTextField(10);
+
+        JButton buttonRunExploer = new JButton("Open file");
+        buttonRunExploer.addActionListener(e -> {
+
+        });
+
+        JLabel nameFile = new JLabel("");
+
+        JButton buttonRunActionFile = new JButton("Go!");
+
+        panel1.setLayout(new FlowLayout());
+        panel1.add(label);
+        panel1.add(enterSize);
+
+        panel2.setLayout(new FlowLayout());
+        panel2.add(nameFile);
+        panel2.add(buttonRunExploer);
+
+        panel3.setLayout(new FlowLayout());
+        panel3.add(buttonRunActionFile);
+
+        frameInFile.add(panel1, BorderLayout.NORTH);
+        frameInFile.add(panel2, BorderLayout.CENTER);
+        frameInFile.add(panel3, BorderLayout.SOUTH);
+        frameInFile.setVisible(true);
+
+
     }
 
     public void goGuiUrl() {
@@ -82,7 +189,7 @@ public class MyGui {
             } catch (UnsupportedEncodingException e1) {
                 e1.printStackTrace();
             }
-            String url = textFieldEnterUrl.getText()+",";
+            String url = textFieldEnterUrl.getText() + ",";
             try {
                 Core.urlAction(url);
             } catch (IOException e1) {
@@ -104,9 +211,9 @@ public class MyGui {
         panelUrl3.setLayout(new FlowLayout());
         panelUrl3.add(buttonGoUrl);
 
-        frameUrl.add(panelUrl1,BorderLayout.NORTH);
-        frameUrl.add(panelUrl2,BorderLayout.CENTER);
-        frameUrl.add(panelUrl3,BorderLayout.SOUTH);
+        frameUrl.add(panelUrl1, BorderLayout.NORTH);
+        frameUrl.add(panelUrl2, BorderLayout.CENTER);
+        frameUrl.add(panelUrl3, BorderLayout.SOUTH);
 
         frameUrl.setVisible(true);
     }

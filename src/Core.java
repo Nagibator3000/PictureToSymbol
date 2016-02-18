@@ -22,6 +22,7 @@ public class Core {
     private static PrintWriter writer;
     private static String namePic = "output";
     private static String nameFloder = "";
+    static int aLongLenght;
 
 
 
@@ -69,38 +70,44 @@ public class Core {
             case "3":
                 System.out.println("Enter user VK id");
                 String userIds = readString();
-                String jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + userIds + "&fields=photo_max_orig");
-                UsersGetResponse usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
-                for (User user : usersGetResponse.response) {
-                    System.out.println(user.photo_max_orig);
-
-                    URL urlImage1 = new URL(user.photo_max_orig);
-                    img = ImageIO.read(urlImage1);
-                    nameFloder = user.first_name + user.last_name + "(photo)" + "/";
-                    namePic = user.first_name;
-                    handleImg(img);
-                }
-
-                String jsonString1 = getUrl("https://api.vk.com/method/friends.get?user_id=" + userIds);
-                FriendsGetResponse friendsGetResponse = new Gson().fromJson(jsonString1, FriendsGetResponse.class);
-                for (Long aLong : friendsGetResponse.response) {
-                    jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + aLong + "&fields=photo_max_orig");
-                    usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
-                    for (User user : usersGetResponse.response) {
-                        System.out.println(user.photo_max_orig);
-                        System.out.println(user.first_name);
-
-                        URL urlImage1 = new URL(user.photo_max_orig);
-                        img = ImageIO.read(urlImage1);
-                        namePic = user.first_name + "_" + user.last_name;
-
-                        handleImg(img);
-                        writer.println(user.first_name);
-                    }
-                }
+                VkIdAction(userIds);
                 break;
         }
         closePrintWriter();
+    }
+
+    public static void VkIdAction(String userIds) throws IOException {
+        BufferedImage img;
+        String jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + userIds + "&fields=photo_max_orig");
+        UsersGetResponse usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
+        for (User user : usersGetResponse.response) {
+            System.out.println(user.photo_max_orig);
+
+            URL urlImage1 = new URL(user.photo_max_orig);
+            img = ImageIO.read(urlImage1);
+            nameFloder = user.first_name + user.last_name + "(photo)" + "/";
+            namePic = user.first_name;
+            handleImg(img);
+        }
+
+        String jsonString1 = getUrl("https://api.vk.com/method/friends.get?user_id=" + userIds);
+        FriendsGetResponse friendsGetResponse = new Gson().fromJson(jsonString1, FriendsGetResponse.class);
+        for (Long aLong : friendsGetResponse.response) {
+            jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + aLong + "&fields=photo_max_orig");
+            usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
+            aLongLenght = friendsGetResponse.response.size();
+            for (User user : usersGetResponse.response) {
+                System.out.println(user.photo_max_orig);
+                System.out.println(user.first_name);
+
+                URL urlImage1 = new URL(user.photo_max_orig);
+                img = ImageIO.read(urlImage1);
+                namePic = user.first_name + "_" + user.last_name;
+
+                handleImg(img);
+                writer.println(user.first_name);
+            }
+        }
     }
 
     public static void closePrintWriter() {
