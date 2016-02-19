@@ -84,7 +84,7 @@ public class Core {
 
             URL urlImage1 = new URL(user.photo_max_orig);
             img = ImageIO.read(urlImage1);
-            nameFloder = user.first_name + user.last_name + "(photo)" + "/";
+            nameFloder = fixNameFile(user.first_name) + fixNameFile(user.last_name) + "(photo)" + "/";
             namePic = user.first_name;
             handleImg(img);
         }
@@ -105,12 +105,21 @@ public class Core {
 
                 URL urlImage1 = new URL(user.photo_max_orig);
                 img = ImageIO.read(urlImage1);
-                namePic = user.first_name + "_" + user.last_name;
+                namePic = fixNameFile(user.first_name) + "_" + fixNameFile(user.last_name);
 
                 handleImg(img);
                 writer.println(user.first_name);
             }
         }
+    }
+
+    private static String fixNameFile(String s1) {
+        String[] incorrectSymbols = new String[]{"<",">",":","\"","/","\\","|","?","*"};
+        String result = s1;
+        for (String incorrectSymbol : incorrectSymbols) {
+            result = result.replace(incorrectSymbol,"");
+        }
+        return result;
     }
 
     public static void closePrintWriter() {
