@@ -162,7 +162,8 @@ public class MyGui {
             int ret = fileopen.showDialog(null, "Открыть файл");
             if (ret == JFileChooser.APPROVE_OPTION) {
                 File file = fileopen.getSelectedFile();
-                fileName = file.getName();
+                fileName = file.getPath();
+                System.out.println(fileName);
 
 
             }
