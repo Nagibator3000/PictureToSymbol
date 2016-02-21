@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PictureToSymbol:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/PictureToSymbol_jar</output-path>
+    <root id="archive" name="PictureToSymbol.jar">
+      <element id="module-output" name="PictureToSymbol" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/okhttp-3.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/gson-2.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/okio-1.6.0.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

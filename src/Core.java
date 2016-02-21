@@ -42,7 +42,7 @@ public class Core {
         if (choice.equals("")) {
             choice = defaultMode;
         }
-        creatPrintWriter();
+        createPrintWriter();
         switch (choice) {
             case "1":
                 System.out.println("Enter file name");
@@ -61,7 +61,7 @@ public class Core {
             case "3":
                 System.out.println("Enter user VK id");
                 String userIds = readString();
-                VkIdAction(userIds);
+                vkIdAction(userIds);
                 break;
         }
         closePrintWriter();
@@ -75,7 +75,7 @@ public class Core {
         handleImg(img);
     }
 
-    public static void VkIdAction(String userIds) throws IOException {
+    public static void vkIdAction(String userIds) throws IOException {
         BufferedImage img;
         String jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + userIds + "&fields=photo_max_orig");
         UsersGetResponse usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
@@ -92,7 +92,8 @@ public class Core {
         String jsonString1 = getUrl("https://api.vk.com/method/friends.get?user_id=" + userIds);
         FriendsGetResponse friendsGetResponse = new Gson().fromJson(jsonString1, FriendsGetResponse.class);
         friendsCount = friendsGetResponse.response.size();
-        java.awt.EventQueue.invokeLater(() ->  MyGui.progressBar.setMaximum(friendsCount));
+
+        java.awt.EventQueue.invokeLater(() -> MyGui.progressBar.setMaximum(friendsCount));
 
         for (Long aLong : friendsGetResponse.response) {
             jsonString = getUrl("https://api.vk.com/method/users.get?user_ids=" + aLong + "&fields=photo_max_orig");
@@ -113,7 +114,7 @@ public class Core {
         }
     }
 
-    private static String fixNameFile(String s1) {
+    public static String fixNameFile(String s1) {
         String[] incorrectSymbols = new String[]{"<",">",":","\"","/","\\","|","?","*"};
         String result = s1;
         for (String incorrectSymbol : incorrectSymbols) {
@@ -126,18 +127,18 @@ public class Core {
         writer.close();
     }
 
-    public static void creatPrintWriter() throws FileNotFoundException, UnsupportedEncodingException {
+    public static void createPrintWriter() throws FileNotFoundException, UnsupportedEncodingException {
         writer = new PrintWriter(outputPath + "imgTxt.txt", "UTF-8");
     }
 
-    public static void urlAction(String urlTitel) throws IOException {
+    public static void urlAction(String urlTitle) throws IOException {
         BufferedImage img;
-        if (urlTitel.equals("")) {
-            urlTitel = defaultIntFile;
+        if (urlTitle.equals("")) {
+            urlTitle = defaultIntFile;
         } else {
-            urlTitel = urlTitel.substring(0, urlTitel.length() - 1);
+            urlTitle = urlTitle.substring(0, urlTitle.length() - 1);
         }
-        URL urlImage = new URL(urlTitel);
+        URL urlImage = new URL(urlTitle);
         img = ImageIO.read(urlImage);
         handleImg(img);
     }
@@ -223,7 +224,7 @@ public class Core {
         myPath.mkdir();
         File outputFile = new File("output/" + nameFloder + namePic + ".png");
         ImageIO.write(outputImg, "png", outputFile);
-        System.out.println("saved output outputImage " + outputFile);
+
     }
 
 

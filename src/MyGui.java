@@ -1,3 +1,5 @@
+import com.google.gson.Gson;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -8,6 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 
 public class MyGui {
     JTextField fieldSize;
@@ -75,7 +78,7 @@ public class MyGui {
         JPanel panel1 = new JPanel();
         JPanel panel2 = new JPanel();
         JPanel panel3 = new JPanel();
-
+        JLabel picLabel = new JLabel();
         JLabel label = new JLabel("Enter size");
         JTextField enterSize = new JTextField(10);
         enterSize.setText(String.valueOf(Core.defaultOutImageSize));
@@ -83,7 +86,9 @@ public class MyGui {
         JLabel label1 = new JLabel("Enter vk id");
         vkIdTextField = new JTextField(10);
         vkIdTextField.setText(Core.defaultId);
-        vkIdTextField.getDocument().addDocumentListener(new VkIdTextFieldListener());
+        VkIdTextFieldListener listener = new VkIdTextFieldListener(picLabel);
+        vkIdTextField.getDocument().addDocumentListener(listener);
+        listener.onChange();
 
 
         progressBar.setStringPainted(true);
@@ -91,7 +96,7 @@ public class MyGui {
         progressBar.setMaximum(Core.friendsCount);
 
         JButton buttonGoVkAction = new JButton("Go!");
-        buttonGoVkAction.addActionListener(e -> new Thread(() -> onVkGoClick(enterSize, vkIdTextField)).start());
+        buttonGoVkAction.addActionListener(e -> new Thread(() -> MyGui.this.onVkGoClick(enterSize, vkIdTextField)).start());
 
         panel1.setLayout(new FlowLayout());
         panel1.add(label);
@@ -101,18 +106,10 @@ public class MyGui {
         panel2.add(label1);
         panel2.add(vkIdTextField);
 
-        BufferedImage myPicture = null;
-        try {
-            myPicture = ImageIO.read(new File("444.png"));
-            JLabel picLabel = new JLabel(new ImageIcon(myPicture));
-            panel3.add(picLabel);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
 
         panel3.setLayout(new FlowLayout());
         panel3.add(buttonGoVkAction);
+        panel3.add(picLabel);
         panel3.add(buttonGoVkAction);
         panel3.add(progressBar);
 
@@ -127,7 +124,7 @@ public class MyGui {
         String size = enterSize.getText();
         Core.setSize(size);
         try {
-            Core.creatPrintWriter();
+            Core.createPrintWriter();
         } catch (FileNotFoundException e1) {
             e1.printStackTrace();
         } catch (UnsupportedEncodingException e1) {
@@ -135,7 +132,7 @@ public class MyGui {
         }
         String userId = jTextFieldVkId.getText();
         try {
-            Core.VkIdAction(userId);
+            Core.vkIdAction(userId);
         } catch (IOException e1) {
             e1.printStackTrace();
         }
@@ -164,8 +161,6 @@ public class MyGui {
                 File file = fileopen.getSelectedFile();
                 fileName = file.getPath();
                 System.out.println(fileName);
-
-
             }
         });
 
@@ -176,7 +171,7 @@ public class MyGui {
             String size = enterSize.getText();
             Core.setSize(size);
             try {
-                Core.creatPrintWriter();
+                Core.createPrintWriter();
             } catch (FileNotFoundException e1) {
                 e1.printStackTrace();
             } catch (UnsupportedEncodingException e1) {
@@ -234,7 +229,7 @@ public class MyGui {
             String size = enterSize.getText();
             Core.setSize(size);
             try {
-                Core.creatPrintWriter();
+                Core.createPrintWriter();
             } catch (FileNotFoundException e1) {
                 e1.printStackTrace();
             } catch (UnsupportedEncodingException e1) {
@@ -271,9 +266,12 @@ public class MyGui {
 
 
     private class VkIdTextFieldListener implements DocumentListener {
+        private JLabel picLabel;
 
+        public VkIdTextFieldListener(JLabel picLabel) {
 
-
+            this.picLabel = picLabel;
+        }
 
         @Override
         public void insertUpdate(DocumentEvent e) {
@@ -281,18 +279,47 @@ public class MyGui {
         }
 
         private void onChange() {
-            System.out.println(vkIdTextField.getText());
+            String userIds = vkIdTextField.getText();
+            if (userIds.equals("")) {
+                System.out.println("users id is empty");
+                return;
+            }
+            try {
+                String jsonString = Core.getUrl("https://api.vk.com/method/users.get?user_ids=" + userIds + "&fields=photo_max_orig");
+                UsersGetResponse usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
+                if (usersGetResponse == null || usersGetResponse.response == null || usersGetResponse.response.isEmpty()) {
+                    System.out.println("invalid vk response for users id "+userIds);
+                    return;
+                }
+                User user = usersGetResponse.response.get(0);
+                System.out.println(user.photo_max_orig);
+                BufferedImage img = null;
+                URL urlImage1 = new URL(user.photo_max_orig);
+                img = ImageIO.read(urlImage1);
+
+                int size = 65;
+                float ratio = img.getHeight() / (img.getWidth() * 1f);
+                int height = (int) (size * ratio);
+                BufferedImage scaled = new BufferedImage(size, height,
+                        BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = scaled.createGraphics();
+                g.drawImage(img, 0, 0, size, (int) (size * ratio), null);
+                g.dispose();
+
+                picLabel.setIcon(new ImageIcon(scaled));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-             onChange();
+            onChange();
         }
 
         @Override
         public void changedUpdate(DocumentEvent e) {
             onChange();
-
         }
     }
 }
