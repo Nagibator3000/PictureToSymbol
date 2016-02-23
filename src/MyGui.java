@@ -279,6 +279,16 @@ public class MyGui {
         }
 
         private void onChange() {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    downloadAvatar();
+                }
+            }).start();
+
+        }
+
+        private void downloadAvatar() {
             String userIds = vkIdTextField.getText();
             if (userIds.equals("")) {
                 System.out.println("users id is empty");
@@ -288,7 +298,7 @@ public class MyGui {
                 String jsonString = Core.getUrl("https://api.vk.com/method/users.get?user_ids=" + userIds + "&fields=photo_max_orig");
                 UsersGetResponse usersGetResponse = new Gson().fromJson(jsonString, UsersGetResponse.class);
                 if (usersGetResponse == null || usersGetResponse.response == null || usersGetResponse.response.isEmpty()) {
-                    System.out.println("invalid vk response for users id "+userIds);
+                    System.out.println("invalid vk response for users id " + userIds);
                     return;
                 }
                 User user = usersGetResponse.response.get(0);
